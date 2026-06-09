@@ -19,6 +19,10 @@ wayfinder-app/.env*
 # Local Place Photos cache
 wayfinder-app/.cache/
 
+# Vercel folders
+.vercel/
+wayfinder-app/.vercel/
+
 # Debug and temp files
 wayfinder-app/*.tsbuildinfo
 wayfinder-app/next-env.d.ts
