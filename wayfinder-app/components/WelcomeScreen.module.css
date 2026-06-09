@@ -1,0 +1,196 @@
+/* WelcomeScreen.module.css */
+
+.wrapper {
+  min-height: 100dvh;
+  background: var(--surface-0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-10) var(--space-5) var(--space-8);
+  position: relative;
+  overflow: hidden;
+  gap: var(--space-6);
+}
+
+/* Ambient glows */
+.glowBlue {
+  position: absolute;
+  top: -80px;
+  left: -60px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(66, 133, 244, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulseGlow 4s ease-in-out infinite alternate;
+}
+
+.glowRed {
+  position: absolute;
+  bottom: 40px;
+  right: -80px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(255, 61, 79, 0.14) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulseGlow 4s ease-in-out 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 1; transform: scale(1.08); }
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  animation: fadeInUp var(--dur-slow) var(--ease-smooth) both;
+}
+
+.logoText {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+/* Headline */
+.headline {
+  text-align: center;
+  animation: fadeInUp var(--dur-slow) var(--ease-smooth) 80ms both;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.blue { color: var(--google-blue); }
+.red  { color: var(--yango-red); }
+
+.subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* Steps */
+.steps {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeInUp var(--dur-slow) var(--ease-smooth) 160ms both;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  animation: fadeInUp var(--dur-slow) var(--ease-smooth) both;
+  position: relative;
+}
+
+.stepConnector {
+  width: 2px;
+  height: 12px;
+  background: var(--border);
+  margin: 2px auto;
+}
+
+.stepIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepText {
+  flex: 1;
+}
+
+.stepTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.stepDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.stepNum {
+  font-size: 22px;
+  font-weight: 800;
+  opacity: 0.15;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Actions */
+.actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: fadeInUp var(--dur-slow) var(--ease-smooth) 240ms both;
+}
+
+.startBtn {
+  font-size: 16px;
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+}
+
+.signInBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-smooth);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.signInBtn:hover {
+  background: var(--surface-2);
+  border-color: var(--google-blue);
+  color: var(--text-primary);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  animation: fadeIn var(--dur-slow) var(--ease-smooth) 350ms both;
+}

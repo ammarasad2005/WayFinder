@@ -1,0 +1,29 @@
+# Google Maps app workspace gitignore
+
+# Ignore the exact ChatGPT generated image
+ChatGPT Image Jun 9, 2026, 04_00_38 PM.png
+
+# Ignore project documentation
+wayfinder-app/AGENTS.md
+wayfinder-app/CLAUDE.md
+
+# Next.js dependencies and builds
+wayfinder-app/node_modules/
+wayfinder-app/.next/
+wayfinder-app/out/
+wayfinder-app/build/
+
+# Next.js local environment variables
+wayfinder-app/.env*
+
+# Local Place Photos cache
+wayfinder-app/.cache/
+
+# Debug and temp files
+wayfinder-app/*.tsbuildinfo
+wayfinder-app/next-env.d.ts
+wayfinder-app/npm-debug.log*
+wayfinder-app/yarn-debug.log*
+wayfinder-app/yarn-error.log*
+.DS_Store
+*.pem

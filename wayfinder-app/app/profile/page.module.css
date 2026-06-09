@@ -1,0 +1,240 @@
+/* app/profile/page.module.css */
+
+.page {
+  min-height: 100dvh;
+  background: var(--surface-0);
+}
+
+.header {
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-6)) var(--space-4) var(--space-4);
+  position: sticky;
+  top: 0;
+  background: var(--surface-0);
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.content {
+  padding: var(--space-5) var(--space-4) calc(var(--bottom-nav-height) + var(--space-6));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* User card */
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  animation: fadeInUp var(--dur-slow) var(--ease-smooth) both;
+}
+
+.userCardSkeleton {
+  height: 80px;
+  border-radius: var(--radius-lg);
+}
+
+.userAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--google-blue);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.userAvatarPlaceholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--google-blue-dim);
+  border: 2px solid var(--google-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--google-blue);
+  flex-shrink: 0;
+}
+
+.userInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.userName {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.userEmail {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+/* Guest card */
+.guestCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.guestIcon {
+  font-size: 48px;
+}
+
+.guestInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guestTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.guestDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.signInBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  justify-content: center;
+}
+
+/* Settings */
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: var(--space-3);
+}
+
+.settingsList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  transition: background var(--dur-fast) var(--ease-smooth);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settingRow:last-child {
+  border-bottom: none;
+}
+
+.settingRow:hover {
+  background: var(--surface-3);
+}
+
+.settingIcon {
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.settingText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settingLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.settingDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* App info */
+.appInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) 0;
+}
+
+.dualBrand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.plus {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.appTagline {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.appVersion {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Sign out */
+.signOutBtn {
+  color: var(--yango-red) !important;
+  border-color: rgba(255, 61, 79, 0.3) !important;
+  width: 100%;
+}
+
+.signOutBtn:hover {
+  background: var(--yango-red-dim) !important;
+}

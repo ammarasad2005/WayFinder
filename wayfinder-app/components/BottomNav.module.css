@@ -1,0 +1,83 @@
+/* BottomNav.module.css */
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-width);
+  height: var(--bottom-nav-height);
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 var(--space-4);
+  z-index: 100;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  position: relative;
+  transition: all var(--dur-fast) var(--ease-smooth);
+  -webkit-tap-highlight-color: transparent;
+  min-width: 64px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-smooth),
+              transform var(--dur-base) var(--ease-spring);
+}
+
+.tab.active .icon {
+  color: var(--google-blue);
+  transform: translateY(-1px);
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-smooth);
+  letter-spacing: 0.2px;
+}
+
+.tab.active .label {
+  color: var(--google-blue);
+  font-weight: 600;
+}
+
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--google-blue);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  animation: slideIn 200ms var(--ease-spring);
+}
+
+@keyframes slideIn {
+  from { width: 0; opacity: 0; }
+  to   { width: 24px; opacity: 1; }
+}
+
+.tab:active .icon {
+  transform: scale(0.92);
+}
