@@ -1,59 +1,82 @@
 // lib/yango-handoff.ts
-// Builds the Yango redirect URL using the confirmed go.link format.
-// https://yango.go.link/route?start-lat=X&start-lon=Y&end-lat=A&end-lon=B
+// Builds the Yango redirect URL using the confirmed go.link format from the partner documentation.
+// https://yango.com/en_int/partner-program/documentation/
 
 export interface YangoHandoffParams {
-  startLat: number;
-  startLng: number;
+  startLat?: number;
+  startLng?: number;
   endLat: number;
   endLng: number;
-  /** Fallback URL if Yango app is not installed */
+  /** Custom fallback URL if Yango app is not installed (optional) */
   fallbackUrl?: string;
+  /** Affiliate / source ID (optional, defaults to 'wayfinder') */
+  ref?: string;
 }
 
 const YANGO_BASE = 'https://yango.go.link/route';
-const YANGO_FALLBACK = 'https://yango.com';
 
 /**
  * Builds a Yango deep link that:
  * - Opens the Yango app with destination pre-filled (if installed)
- * - Falls back to yango.com if app is not installed
+ * - Falls back to the Yango Web Order flow with coordinates prefilled (if not installed)
  */
 export function buildYangoUrl(params: YangoHandoffParams): string {
-  const { startLat, startLng, endLat, endLng, fallbackUrl } = params;
+  const { startLat, startLng, endLat, endLng, fallbackUrl, ref = 'wayfinder' } = params;
 
   const url = new URL(YANGO_BASE);
-  url.searchParams.set('start-lat', startLat.toFixed(6));
-  url.searchParams.set('start-lon', startLng.toFixed(6));
+  
+  // Required Technical parameters for Adjust tracking/deeplinking to work correctly
+  url.searchParams.set('adj_t', 'vokme8e_nd9s9z9'); // Widget tracker token
+  url.searchParams.set('adj_deeplink_js', '1');
+  url.searchParams.set('utm_source', 'widget');
+  url.searchParams.set('adj_adgroup', 'widget');
+  url.searchParams.set('ref', ref);
+  url.searchParams.set('lang', 'en'); // Use English language for UI
+
+  // Only set starting coordinates if they are explicitly provided
+  if (startLat !== undefined && startLng !== undefined) {
+    url.searchParams.set('start-lat', startLat.toFixed(6));
+    url.searchParams.set('start-lon', startLng.toFixed(6));
+  }
+  
   url.searchParams.set('end-lat', endLat.toFixed(6));
   url.searchParams.set('end-lon', endLng.toFixed(6));
 
-  if (fallbackUrl) {
-    url.searchParams.set('adj_fallback', fallbackUrl);
-  } else {
-    url.searchParams.set('adj_fallback', YANGO_FALLBACK);
+  // Determine fallback URL (web order page)
+  let resolvedFallback = fallbackUrl;
+  if (!resolvedFallback) {
+    // Format the official Yango web ordering fallback:
+    // https://yango.com/en_int/order/?gfrom=lon,lat&gto=lon,lat&ref=ref
+    const fallbackBase = 'https://yango.com/en_int/order/';
+    const fallbackParams = new URLSearchParams();
+    
+    if (startLat !== undefined && startLng !== undefined) {
+      // Yango's web ordering uses `gfrom=longitude,latitude`
+      fallbackParams.set('gfrom', `${startLng.toFixed(6)},${startLat.toFixed(6)}`);
+    }
+    // Yango's web ordering uses `gto=longitude,latitude`
+    fallbackParams.set('gto', `${endLng.toFixed(6)},${endLat.toFixed(6)}`);
+    fallbackParams.set('ref', ref);
+    
+    resolvedFallback = `${fallbackBase}?${fallbackParams.toString()}`;
   }
+
+  url.searchParams.set('adj_fallback', resolvedFallback);
 
   return url.toString();
 }
 
 /**
- * Builds a Yango URL using only the destination (pickup = current location).
- * startLat/Lng defaults to Islamabad center when user location is unavailable.
+ * Builds a Yango URL using only the destination.
+ * We omit starting coordinates so the native Yango app automatically uses 
+ * the mobile device's high-accuracy GPS for the pickup location. 
+ * This avoids inter-city tariff loading failures and loading screen hangs.
  */
 export function buildYangoUrlFromDestination(
   destLat: number,
-  destLng: number,
-  userLat?: number,
-  userLng?: number
+  destLng: number
 ): string {
-  // Default pickup: Islamabad city center
-  const startLat = userLat ?? 33.6844;
-  const startLng = userLng ?? 73.0479;
-
   return buildYangoUrl({
-    startLat,
-    startLng,
     endLat: destLat,
     endLng: destLng,
   });
