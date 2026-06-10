@@ -153,13 +153,11 @@ export default function PlaceDetailPage({ params }: { params: Promise<{ placeId:
     if (!place) return;
     const url = buildYangoUrlFromDestination(
       place.geometry.location.lat,
-      place.geometry.location.lng,
-      userLat,
-      userLng
+      place.geometry.location.lng
     );
     // Open in same tab — Yango's go.link handles app/web routing
     window.location.href = url;
-  }, [place, userLat, userLng]);
+  }, [place]);
 
   /* ── Loading ── */
   if (isLoading) return <LoadingSkeleton onBack={() => router.back()} />;

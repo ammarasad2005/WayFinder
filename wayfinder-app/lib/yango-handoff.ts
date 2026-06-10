@@ -3,8 +3,8 @@
 // https://yango.go.link/route?start-lat=X&start-lon=Y&end-lat=A&end-lon=B
 
 export interface YangoHandoffParams {
-  startLat: number;
-  startLng: number;
+  startLat?: number;
+  startLng?: number;
   endLat: number;
   endLng: number;
   /** Fallback URL if Yango app is not installed */
@@ -23,8 +23,13 @@ export function buildYangoUrl(params: YangoHandoffParams): string {
   const { startLat, startLng, endLat, endLng, fallbackUrl } = params;
 
   const url = new URL(YANGO_BASE);
-  url.searchParams.set('start-lat', startLat.toFixed(6));
-  url.searchParams.set('start-lon', startLng.toFixed(6));
+  
+  // Only set starting coordinates if they are explicitly provided
+  if (startLat !== undefined && startLng !== undefined) {
+    url.searchParams.set('start-lat', startLat.toFixed(6));
+    url.searchParams.set('start-lon', startLng.toFixed(6));
+  }
+  
   url.searchParams.set('end-lat', endLat.toFixed(6));
   url.searchParams.set('end-lon', endLng.toFixed(6));
 
@@ -38,22 +43,16 @@ export function buildYangoUrl(params: YangoHandoffParams): string {
 }
 
 /**
- * Builds a Yango URL using only the destination (pickup = current location).
- * startLat/Lng defaults to Islamabad center when user location is unavailable.
+ * Builds a Yango URL using only the destination.
+ * We omit starting coordinates so the native Yango app automatically uses 
+ * the mobile device's high-accuracy GPS for the pickup location. 
+ * This avoids inter-city tariff loading failures and loading screen hangs.
  */
 export function buildYangoUrlFromDestination(
   destLat: number,
-  destLng: number,
-  userLat?: number,
-  userLng?: number
+  destLng: number
 ): string {
-  // Default pickup: Islamabad city center
-  const startLat = userLat ?? 33.6844;
-  const startLng = userLng ?? 73.0479;
-
   return buildYangoUrl({
-    startLat,
-    startLng,
     endLat: destLat,
     endLng: destLng,
   });
