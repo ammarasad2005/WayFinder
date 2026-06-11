@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildYangoUrl, buildYangoUrlFromDestination } from '@/lib/yango-handoff';
+import { buildYangoUrl, buildDirectWebOrderUrl } from '@/lib/yango-handoff';
 import { savePlace, unsavePlace, isPlaceSaved } from '@/lib/storage';
 import BottomNav from '@/components/BottomNav';
 import MapEmbed from '@/components/MapEmbed';
@@ -154,24 +154,29 @@ export default function PlaceDetailPage({ params }: { params: Promise<{ placeId:
     const destLat = place.geometry.location.lat;
     const destLng = place.geometry.location.lng;
 
-    // Check if user is in the same city/region (approx. within 80km)
-    const isLocal =
-      userLat !== undefined &&
-      userLng !== undefined &&
-      Math.abs(userLat - destLat) < 0.8 &&
-      Math.abs(userLng - destLng) < 0.8;
+    // Pickup uses user GPS if available, otherwise falls back to Islamabad (33.6844, 73.0479)
+    const startLat = userLat ?? 33.6844;
+    const startLng = userLng ?? 73.0479;
 
-    // We ALWAYS pass starting coordinates to Yango to prevent a white loading screen lockup.
-    // If the user is local, use their GPS; otherwise use the destination itself to ensure a local trip.
-    const startLat = isLocal ? userLat : destLat;
-    const startLng = isLocal ? userLng : destLng;
-
-    const url = buildYangoUrl({
+    const handoffParams = {
       startLat,
       startLng,
       endLat: destLat,
       endLng: destLng,
-    });
+    };
+
+    const url = buildYangoUrl(handoffParams);
+    const directUrl = buildDirectWebOrderUrl(handoffParams);
+
+    // Set 4-second timeout to fall back to the direct web ordering URL if go.link hangs or is blocked
+    const fallbackTimer = setTimeout(() => {
+      window.location.href = directUrl;
+    }, 4000);
+
+    // Clean up timer if the page navigates away successfully
+    const clearTimer = () => clearTimeout(fallbackTimer);
+    window.addEventListener('beforeunload', clearTimer);
+    window.addEventListener('pagehide', clearTimer);
 
     // Open in same tab — Yango's go.link handles app/web routing
     window.location.href = url;

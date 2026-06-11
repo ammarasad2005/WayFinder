@@ -11,9 +11,40 @@ export interface YangoHandoffParams {
   fallbackUrl?: string;
   /** Affiliate / source ID (optional, defaults to 'wayfinder') */
   ref?: string;
+  /** Locale directory for Yango web portal (optional, defaults to 'en_pk') */
+  locale?: string;
 }
 
 const YANGO_BASE = 'https://yango.go.link/route';
+
+/**
+ * Generates a direct web ordering URL for Yango (bypassing Adjust tracking domain).
+ * Used as a secondary fallback if the Adjust tracking proxy hangs or gets blocked.
+ */
+export function buildDirectWebOrderUrl(params: YangoHandoffParams): string {
+  const { startLat, startLng, endLat, endLng, locale = 'en_pk', ref = 'wayfinder' } = params;
+  
+  const fallbackBase = `https://yango.com/${locale}/order/`;
+  const fallbackParams = new URLSearchParams();
+  
+  // Always guarantee start coordinates are populated
+  const resolvedStartLat = startLat ?? endLat;
+  const resolvedStartLng = startLng ?? endLng;
+  
+  // Yango web order interface accepts gfrom/gto in (longitude,latitude) format
+  fallbackParams.set('gfrom', `${resolvedStartLng.toFixed(6)},${resolvedStartLat.toFixed(6)}`);
+  fallbackParams.set('gto', `${endLng.toFixed(6)},${endLat.toFixed(6)}`);
+  fallbackParams.set('ref', ref);
+  
+  return `${fallbackBase}?${fallbackParams.toString()}`;
+}
+
+/**
+ * Reusable wrapper to construct web fallback URLs with proper parameter typing.
+ */
+export function buildWebOrderFallbackUrl(params: YangoHandoffParams): string {
+  return buildDirectWebOrderUrl(params);
+}
 
 /**
  * Builds a Yango deep link that:
@@ -30,37 +61,22 @@ export function buildYangoUrl(params: YangoHandoffParams): string {
   url.searchParams.set('adj_deeplink_js', '1');
   url.searchParams.set('utm_source', 'widget');
   url.searchParams.set('adj_adgroup', 'widget');
+  url.searchParams.set('adj_channel', ref);
   url.searchParams.set('ref', ref);
   url.searchParams.set('lang', 'en'); // Use English language for UI
 
-  // Only set starting coordinates if they are explicitly provided
-  if (startLat !== undefined && startLng !== undefined) {
-    url.searchParams.set('start-lat', startLat.toFixed(6));
-    url.searchParams.set('start-lon', startLng.toFixed(6));
-  }
+  // Always resolve start coordinates (fallback to destination if not provided)
+  const resolvedStartLat = startLat ?? endLat;
+  const resolvedStartLng = startLng ?? endLng;
+
+  url.searchParams.set('start-lat', resolvedStartLat.toFixed(6));
+  url.searchParams.set('start-lon', resolvedStartLng.toFixed(6));
   
   url.searchParams.set('end-lat', endLat.toFixed(6));
   url.searchParams.set('end-lon', endLng.toFixed(6));
 
   // Determine fallback URL (web order page)
-  let resolvedFallback = fallbackUrl;
-  if (!resolvedFallback) {
-    // Format the official Yango web ordering fallback:
-    // https://yango.com/en_int/order/?gfrom=lon,lat&gto=lon,lat&ref=ref
-    const fallbackBase = 'https://yango.com/en_int/order/';
-    const fallbackParams = new URLSearchParams();
-    
-    if (startLat !== undefined && startLng !== undefined) {
-      // Yango's web ordering uses `gfrom=longitude,latitude`
-      fallbackParams.set('gfrom', `${startLng.toFixed(6)},${startLat.toFixed(6)}`);
-    }
-    // Yango's web ordering uses `gto=longitude,latitude`
-    fallbackParams.set('gto', `${endLng.toFixed(6)},${endLat.toFixed(6)}`);
-    fallbackParams.set('ref', ref);
-    
-    resolvedFallback = `${fallbackBase}?${fallbackParams.toString()}`;
-  }
-
+  const resolvedFallback = fallbackUrl || buildDirectWebOrderUrl(params);
   url.searchParams.set('adj_fallback', resolvedFallback);
 
   return url.toString();
@@ -68,9 +84,8 @@ export function buildYangoUrl(params: YangoHandoffParams): string {
 
 /**
  * Builds a Yango URL using only the destination.
- * We omit starting coordinates so the native Yango app automatically uses 
- * the mobile device's high-accuracy GPS for the pickup location. 
- * This avoids inter-city tariff loading failures and loading screen hangs.
+ * We fallback starting coordinates to destination coordinates so the Yango app 
+ * registers a valid local trip instantly, preventing loading screen hangs.
  */
 export function buildYangoUrlFromDestination(
   destLat: number,
