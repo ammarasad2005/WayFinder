@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildYangoUrlFromDestination } from '@/lib/yango-handoff';
+import { buildYangoUrl, buildYangoUrlFromDestination } from '@/lib/yango-handoff';
 import { savePlace, unsavePlace, isPlaceSaved } from '@/lib/storage';
 import BottomNav from '@/components/BottomNav';
 import MapEmbed from '@/components/MapEmbed';
@@ -151,13 +151,31 @@ export default function PlaceDetailPage({ params }: { params: Promise<{ placeId:
 
   const handleYangoHandoff = useCallback(() => {
     if (!place) return;
-    const url = buildYangoUrlFromDestination(
-      place.geometry.location.lat,
-      place.geometry.location.lng
-    );
+    const destLat = place.geometry.location.lat;
+    const destLng = place.geometry.location.lng;
+
+    // Check if user is in the same city/region (approx. within 80km)
+    const isLocal =
+      userLat !== undefined &&
+      userLng !== undefined &&
+      Math.abs(userLat - destLat) < 0.8 &&
+      Math.abs(userLng - destLng) < 0.8;
+
+    // We ALWAYS pass starting coordinates to Yango to prevent a white loading screen lockup.
+    // If the user is local, use their GPS; otherwise use the destination itself to ensure a local trip.
+    const startLat = isLocal ? userLat : destLat;
+    const startLng = isLocal ? userLng : destLng;
+
+    const url = buildYangoUrl({
+      startLat,
+      startLng,
+      endLat: destLat,
+      endLng: destLng,
+    });
+
     // Open in same tab — Yango's go.link handles app/web routing
     window.location.href = url;
-  }, [place]);
+  }, [place, userLat, userLng]);
 
   /* ── Loading ── */
   if (isLoading) return <LoadingSkeleton onBack={() => router.back()} />;
